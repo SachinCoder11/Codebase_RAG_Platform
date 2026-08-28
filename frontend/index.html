@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antigravity RAG — Repository Due Diligence Platform</title>
+  <meta name="description" content="AI-powered repository analysis platform with due diligence scoring, security analysis, dependency intelligence, and architecture overview.">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Ambient Background Glows -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div class="ambient-glow glow-3"></div>
+
+  <div class="app-container">
+
+    <!-- ── Sidebar ─────────────────────────────────────────────────── -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <span class="logo-icon">▲</span>
+          <span class="logo-text">Antigravity RAG</span>
+        </div>
+      </div>
+
+      <div class="workspace-selector-container">
+        <label for="workspace-select">Active Repository</label>
+        <select id="workspace-select" class="workspace-dropdown">
+          <option value="" disabled selected>Select indexed repo...</option>
+        </select>
+      </div>
+
+      <nav class="sidebar-nav">
+        <ul>
+          <li><button class="nav-btn active" data-target="landing-view"><span class="btn-icon">📁</span> Ingestion</button></li>
+          <li class="nav-section-title">Dashboard</li>
+          <li><button class="nav-btn" data-target="dashboard-view" id="nav-dashboard" disabled><span class="btn-icon">🎯</span> Due Diligence</button></li>
+          <li><button class="nav-btn" data-target="modern-view" id="nav-modern" disabled><span class="btn-icon">✨</span> Modern Codebase</button></li>
+          <li><button class="nav-btn" data-target="compare-view" id="nav-compare"><span class="btn-icon">⚖️</span> Repo Comparison</button></li>
+          <li><button class="nav-btn" data-target="deps-view" id="nav-deps" disabled><span class="btn-icon">📦</span> Dependencies</button></li>
+          <li><button class="nav-btn" data-target="license-view" id="nav-license" disabled><span class="btn-icon">📜</span> Licenses</button></li>
+          <li class="nav-section-title">Analysis</li>
+          <li><button class="nav-btn" data-target="explorer-view" id="nav-explorer" disabled><span class="btn-icon">🗂️</span> File Explorer</button></li>
+          <li><button class="nav-btn" data-target="chat-view" id="nav-chat" disabled><span class="btn-icon">💬</span> AI Chat</button></li>
+          <li><button class="nav-btn" data-target="reports-view" id="nav-reports" disabled><span class="btn-icon">📋</span> Code Audit</button></li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="connection-status">
+          <span class="status-indicator online"></span>
+          <span class="status-label">Backend: Connected</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ── Main Canvas ─────────────────────────────────────────────── -->
+    <main class="main-canvas">
+
+      <!-- Top Navbar -->
+      <header class="top-navbar">
+        <div class="breadcrumb">
+          <span class="breadcrumb-root">Workspace</span>
+          <span class="breadcrumb-separator">/</span>
+          <span class="breadcrumb-active" id="active-repo-name">None Selected</span>
+        </div>
+        <div class="header-actions">
+          <div class="model-badge">
+            <span class="model-icon">🧠</span> Model: <strong id="active-model">Detecting...</strong>
+          </div>
+        </div>
+      </header>
+
+      <!-- ══════════════════════════════════════════════════════════════
+           VIEW 1: Ingestion
+      ══════════════════════════════════════════════════════════════════ -->
+      <section id="landing-view" class="view-panel active">
+        <div class="hero-section">
+          <h1>Analyze Your Codebase Semantically</h1>
+          <p class="subtitle">Upload a ZIP file or clone from GitHub to parse, index, and generate a full Due Diligence report with RAG-powered intelligence.</p>
+        </div>
+
+        <div class="ingestion-grid">
+          <div class="glass-card upload-card">
+            <h3>ZIP Archive Ingestion</h3>
+            <p class="card-desc">Drag &amp; drop or browse your local repository ZIP (up to 500MB).</p>
+            <div class="drop-zone" id="drop-zone">
+              <span class="drop-icon">📤</span>
+              <p>Drag files here or <span class="browse-link">browse</span></p>
+              <input type="file" id="zip-input" accept=".zip" style="display: none;">
+            </div>
+            <div id="file-info" class="file-info" style="display: none;">
+              <span class="file-name">repository.zip</span>
+              <button id="upload-btn" class="primary-btn">Index ZIP Repository</button>
+            </div>
+          </div>
+
+          <div class="glass-card git-card">
+            <h3>GitHub Repository Import</h3>
+            <p class="card-desc">Provide a public HTTPS cloning URL to checkout and index.</p>
+            <div class="form-group">
+              <label for="git-url">Git Repository URL</label>
+              <input type="text" id="git-url" placeholder="https://github.com/username/repo.git">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="git-branch">Branch</label>
+                <input type="text" id="git-branch" value="main">
+              </div>
+            </div>
+            <button id="clone-btn" class="primary-btn">Clone &amp; Index codebase</button>
+          </div>
+        </div>
+
+        <div class="glass-card list-card">
+          <h3>Indexed Workspaces</h3>
+          <div class="table-container">
+            <table class="repo-table">
+              <thead>
+                <tr>
+                  <th>Name</th><th>Status</th><th>Files</th>
+                  <th>Total Lines</th><th>Languages</th><th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="repo-list-body">
+                <tr><td colspan="6" class="empty-table-msg">No indexed workspaces found. Upload one to start!</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════
+           VIEW 2: Due Diligence Dashboard
+      ══════════════════════════════════════════════════════════════════ -->
+      <section id="dashboard-view" class="view-panel">
+
+        <!-- Dashboard Loading State -->
+        <div id="dd-loading" class="dd-loading-overlay" style="display:none;">
+          <div class="dd-spinner"></div>
+          <p>Assembling intelligence data...</p>
+        </div>
+
+        <!-- ── Row 1: Overview Header ─────────────────────────────── -->
+        <div class="dd-overview-header glass-card" id="dd-overview-header">
+          <div class="dd-repo-identity">
+            <div class="dd-repo-icon">📦</div>
+            <div class="dd-repo-meta">
+              <h2 id="dd-repo-name">Repository Name</h2>
+              <div class="dd-repo-tags">
+                <span class="dd-tag tag-owner" id="dd-owner">owner</span>
+                <span class="dd-tag tag-type" id="dd-source-type">github</span>
+                <span class="dd-tag tag-lang" id="dd-primary-lang">Python</span>
+              </div>
+              <div class="dd-repo-url" id="dd-source-url">https://github.com/...</div>
+            </div>
+          </div>
+          <div class="dd-overview-stats">
+            <div class="dd-stat-item">
+              <div class="dd-stat-value" id="dd-total-files">0</div>
+              <div class="dd-stat-label">Files</div>
+            </div>
+            <div class="dd-stat-item">
+              <div class="dd-stat-value" id="dd-total-lines">0</div>
+              <div class="dd-stat-label">Lines of Code</div>
+            </div>
+            <div class="dd-stat-item">
+              <div class="dd-stat-value" id="dd-contributors">0</div>
+              <div class="dd-stat-label">Contributors</div>
+            </div>
+            <div class="dd-stat-item">
+              <div class="dd-stat-value" id="dd-last-commit">—</div>
+              <div class="dd-stat-label">Last Commit</div>
+            </div>
+          </div>
+          <div class="dd-report-actions">
+            <button id="dd-generate-reports-btn" class="primary-btn btn-sm">⬇ Generate Reports</button>
+          </div>
+        </div>
+
+        <!-- ── Row 2: Submission + Quality (Hero Gauges) ──────────── -->
+        <div class="dd-hero-row">
+
+          <!-- Submission Readiness Gauge -->
+          <div class="glass-card dd-gauge-card">
+            <h3>Submission Readiness</h3>
+            <div class="dd-gauge-wrapper">
+              <svg class="dd-gauge-svg" viewBox="0 0 200 120" id="dd-submission-gauge-svg">
+                <path d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="16" stroke-linecap="round"/>
+                <path d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke="url(#submissionGrad)" stroke-width="16" stroke-linecap="round"
+                      stroke-dasharray="251.3" stroke-dashoffset="251.3" id="dd-submission-arc" class="gauge-arc-animated"/>
+                <defs>
+                  <linearGradient id="submissionGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#f97316"/>
+                    <stop offset="50%" style="stop-color:#eab308"/>
+                    <stop offset="100%" style="stop-color:#22c55e"/>
+                  </linearGradient>
+                </defs>
+                <text x="100" y="95" text-anchor="middle" class="gauge-value-text" id="dd-submission-score-text">0</text>
+                <text x="100" y="112" text-anchor="middle" class="gauge-label-text">/100</text>
+              </svg>
+            </div>
+            <div class="dd-approval-badge" id="dd-approval-badge">—</div>
+            <div class="dd-confidence-row">
+              <span class="dd-conf-label">Confidence</span>
+              <div class="dd-conf-bar-track">
+                <div class="dd-conf-bar-fill" id="dd-confidence-bar" style="width:0%"></div>
+              </div>
+              <span class="dd-conf-value" id="dd-confidence-value">0%</span>
+            </div>
+            <div class="dd-checklist-summary" id="dd-checklist-summary">0/8 checks passed</div>
+          </div>
+
+          <!-- Engineering Quality Gauge -->
+          <div class="glass-card dd-gauge-card">
+            <h3>Engineering Quality</h3>
+            <div class="dd-gauge-wrapper">
+              <svg class="dd-gauge-svg" viewBox="0 0 200 120">
+                <path d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="16" stroke-linecap="round"/>
+                <path d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke="url(#qualityGrad)" stroke-width="16" stroke-linecap="round"
+                      stroke-dasharray="251.3" stroke-dashoffset="251.3" id="dd-quality-arc" class="gauge-arc-animated"/>
+                <defs>
+                  <linearGradient id="qualityGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#8b5cf6"/>
+                    <stop offset="100%" style="stop-color:#06b6d4"/>
+                  </linearGradient>
+                </defs>
+                <text x="100" y="95" text-anchor="middle" class="gauge-value-text" id="dd-quality-score-text">0</text>
+                <text x="100" y="112" text-anchor="middle" class="gauge-label-text">/100</text>
+              </svg>
+            </div>
+            <div class="dd-quality-dimensions" id="dd-quality-dimensions">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <!-- Security Gauge -->
+          <div class="glass-card dd-gauge-card">
+            <h3>Security Score</h3>
+            <div class="dd-gauge-wrapper">
+              <svg class="dd-gauge-svg" viewBox="0 0 200 120">
+                <path d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="16" stroke-linecap="round"/>
+                <path d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke="url(#securityGrad)" stroke-width="16" stroke-linecap="round"
+                      stroke-dasharray="251.3" stroke-dashoffset="251.3" id="dd-security-arc" class="gauge-arc-animated"/>
+                <defs>
+                  <linearGradient id="securityGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#ef4444"/>
+                    <stop offset="60%" style="stop-color:#f97316"/>
+                    <stop offset="100%" style="stop-color:#22c55e"/>
+                  </linearGradient>
+                </defs>
+                <text x="100" y="95" text-anchor="middle" class="gauge-value-text" id="dd-security-score-text">0</text>
+                <text x="100" y="112" text-anchor="middle" class="gauge-label-text">/100</text>
+              </svg>
+            </div>
+            <div class="dd-sev-counters" id="dd-sev-counters">
+              <div class="dd-sev-item critical"><span class="sev-count" id="dd-sev-critical">0</span><span class="sev-label">Critical</span></div>
+              <div class="dd-sev-item high"><span class="sev-count" id="dd-sev-high">0</span><span class="sev-label">High</span></div>
+              <div class="dd-sev-item medium"><span class="sev-count" id="dd-sev-medium">0</span><span class="sev-label">Medium</span></div>
+              <div class="dd-sev-item low"><span class="sev-count" id="dd-sev-low">0</span><span class="sev-label">Low</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Row 3: Compliance + Architecture ───────────────────── -->
+        <div class="dd-mid-row">
+
+          <!-- Modern Codebase Compliance Panel -->
+          <div class="glass-card dd-compliance-card">
+            <h3>Modern Codebase Compliance</h3>
+            <div class="dd-compliance-list" id="dd-compliance-list">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <!-- Architecture Card -->
+          <div class="glass-card dd-arch-card">
+            <h3>Architecture Overview</h3>
+            <div class="dd-arch-grid" id="dd-arch-grid">
+              <!-- Populated by JS -->
+            </div>
+            <div class="dd-arch-frameworks" id="dd-arch-frameworks">
+              <!-- Framework chips -->
+            </div>
+          </div>
+
+          <!-- Language Distribution -->
+          <div class="glass-card dd-lang-card">
+            <h3>Language Distribution</h3>
+            <div id="dd-language-bars" class="language-bars-container">
+              <!-- Populated by JS -->
+            </div>
+            <h4 style="margin-top:1.2rem; font-size:0.8rem; color:var(--text-muted);">Frameworks Detected</h4>
+            <div class="framework-chips" id="dd-framework-chips"></div>
+          </div>
+        </div>
+
+        <!-- ── Row 4: Security Findings ───────────────────────────── -->
+        <div class="glass-card dd-security-findings-card">
+          <div class="dd-section-header">
+            <h3>Security Findings</h3>
+            <div class="dd-sev-filter" id="dd-sev-filter">
+              <button class="sev-filter-btn active" data-sev="ALL">All</button>
+              <button class="sev-filter-btn" data-sev="CRITICAL">Critical</button>
+              <button class="sev-filter-btn" data-sev="HIGH">High</button>
+              <button class="sev-filter-btn" data-sev="MEDIUM">Medium</button>
+              <button class="sev-filter-btn" data-sev="LOW">Low</button>
+            </div>
+          </div>
+          <div class="dd-findings-table-wrapper">
+            <table class="dd-findings-table" id="dd-findings-table">
+              <thead>
+                <tr>
+                  <th>Severity</th><th>File</th><th>Line</th><th>Description</th><th>Snippet</th>
+                </tr>
+              </thead>
+              <tbody id="dd-findings-body">
+                <tr><td colspan="5" class="empty-table-msg">No security findings loaded.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ── Row 5: Git Activity + Dependency + License ─────────── -->
+        <div class="dd-bottom-row">
+
+          <!-- Git Activity -->
+          <div class="glass-card dd-git-card">
+            <h3>Git Activity</h3>
+            <div class="dd-git-stats" id="dd-git-stats">
+              <div class="dd-git-stat"><span class="dd-git-icon">⭐</span><span class="dd-git-val" id="dd-stars">—</span><span class="dd-git-lbl">Stars</span></div>
+              <div class="dd-git-stat"><span class="dd-git-icon">🍴</span><span class="dd-git-val" id="dd-forks">—</span><span class="dd-git-lbl">Forks</span></div>
+              <div class="dd-git-stat"><span class="dd-git-icon">👥</span><span class="dd-git-val" id="dd-git-contributors">—</span><span class="dd-git-lbl">Contributors</span></div>
+              <div class="dd-git-stat"><span class="dd-git-icon">🐛</span><span class="dd-git-val" id="dd-issues">—</span><span class="dd-git-lbl">Issues</span></div>
+              <div class="dd-git-stat"><span class="dd-git-icon">🔀</span><span class="dd-git-val" id="dd-prs">—</span><span class="dd-git-lbl">Open PRs</span></div>
+              <div class="dd-git-stat"><span class="dd-git-icon">📅</span><span class="dd-git-val" id="dd-last-push">—</span><span class="dd-git-lbl">Last Push</span></div>
+            </div>
+            <div class="dd-git-no-data" id="dd-git-no-data" style="display:none;">
+              <span>📦 Local repository — GitHub activity not available</span>
+            </div>
+          </div>
+
+          <!-- Dependency Intelligence -->
+          <div class="glass-card dd-dep-card">
+            <h3>Dependency Intelligence</h3>
+            <div class="dd-dep-summary" id="dd-dep-summary">
+              <div class="dd-dep-metric">
+                <div class="dd-dep-val" id="dd-dep-total">0</div>
+                <div class="dd-dep-lbl">Total Packages</div>
+              </div>
+              <div class="dd-dep-metric">
+                <div class="dd-dep-val flagged" id="dd-dep-flagged">0</div>
+                <div class="dd-dep-lbl">Flagged</div>
+              </div>
+              <div class="dd-dep-metric">
+                <div class="dd-dep-val" id="dd-dep-risk">—</div>
+                <div class="dd-dep-lbl">Risk Score</div>
+              </div>
+            </div>
+            <div class="dd-dep-list" id="dd-dep-list">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <!-- License Analysis -->
+          <div class="glass-card dd-license-card">
+            <h3>License Analysis</h3>
+            <div class="dd-license-badge-wrapper">
+              <div class="dd-license-badge" id="dd-license-badge">Unknown</div>
+            </div>
+            <div class="dd-license-category" id="dd-license-category">—</div>
+            <div class="dd-license-compat" id="dd-license-compat">—</div>
+            <div class="dd-license-source" id="dd-license-source"></div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════
+           VIEW 2.1: Modern Codebase
+      ══════════════════════════════════════════════════════════════════ -->
+      <section id="modern-view" class="view-panel">
+        <div class="glass-card">
+          <h2>Modern Codebase Evaluation</h2>
+          <div id="modern-eval-content">
+            <p>Select a repository to view its modern codebase evaluation.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════
+           VIEW 2.2: Repository Comparison
+      ══════════════════════════════════════════════════════════════════ -->
+      <section id="compare-view" class="view-panel">
+        <div class="glass-card">
+          <h2>Compare Repositories</h2>
+          <div class="compare-selectors" style="display:flex; gap:1rem; margin-bottom: 2rem;">
+            <select id="compare-repo-a" class="workspace-dropdown"><option>Select Repo A</option></select>
+            <select id="compare-repo-b" class="workspace-dropdown"><option>Select Repo B</option></select>
+            <button id="btn-compare" class="primary-btn">Compare</button>
+          </div>
+          <div id="compare-results-content" style="display:flex; gap:1rem;">
+            <!-- Render comparison here -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════
+           VIEW 2.3: Dependency Intelligence
+      ══════════════════════════════════════════════════════════════════ -->
+      <section id="deps-view" class="view-panel">
+        <div class="glass-card">
+          <h2>Dependency Intelligence</h2>
+          <div id="deps-content">
+             <p>Select a repository to view dependency intelligence.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════
+           VIEW 2.4: License Intelligence
+      ══════════════════════════════════════════════════════════════════ -->
+      <section id="license-view" class="view-panel">
+        <div class="glass-card">
+          <h2>License Intelligence</h2>
+          <div id="license-content">
+             <p>Select a repository to view license intelligence.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════
+           VIEW 3: File Explorer
+      ══════════════════════════════════════════════════════════════════ -->
+      <section id="explorer-view" class="view-panel">
+        <div class="explorer-grid">
+          <div class="glass-card tree-panel">
+            <h3>File Navigator</h3>
+            <div class="tree-search">
+              <input type="text" id="tree-search-input" placeholder="Search files...">
+            </div>
+            <div class="file-tree" id="file-tree-container"></div>
+          </div>
+          <div class="glass-card viewer-panel">
+            <div class="viewer-header">
+              <h4 id="viewer-file-path">No File Selected</h4>
+              <div class="viewer-meta" id="viewer-file-meta" style="display: none;">
+                Size: <span id="viewer-meta-size">0 KB</span> | Language: <span id="viewer-meta-lang">None</span>
+              </div>
+            </div>
+            <div class="code-view-container">
+              <pre><code id="code-content-block">Select a file from the explorer to view its contents.</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════
+           VIEW 4: AI Chat
+      ══════════════════════════════════════════════════════════════════ -->
+      <section id="chat-view" class="view-panel">
+        <div class="chat-container">
+          <div class="chat-config-bar">
+            <div class="config-item">
+              <label for="chat-top-k">Retrieve top-k contexts</label>
+              <input type="number" id="chat-top-k" value="7" min="1" max="15">
+            </div>
+            <div class="config-item">
+              <label for="chat-filter-lang">Filter language</label>
+              <select id="chat-filter-lang">
+                <option value="">All languages</option>
+              </select>
+            </div>
+          </div>
+          <div class="chat-messages-area" id="chat-messages-area">
+            <div class="chat-msg system-msg">
+              <div class="msg-bubble">Hello! I have fully indexed this repository. Ask me any question about the architecture, functions, endpoints, or data models.</div>
+            </div>
+          </div>
+          <div class="suggested-prompts-container">
+            <button class="suggested-btn">Explain project architecture</button>
+            <button class="suggested-btn">Where is database configuration?</button>
+            <button class="suggested-btn">Are there any security vulnerabilities?</button>
+          </div>
+          <div class="chat-input-row">
+            <textarea id="chat-input" placeholder="Ask a question about the repository..." rows="2"></textarea>
+            <button id="chat-send-btn" class="primary-btn">Ask AI</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════
+           VIEW 5: Code Audit Report
+      ══════════════════════════════════════════════════════════════════ -->
+      <section id="reports-view" class="view-panel">
+        <div class="reports-header-row">
+          <div>
+            <h2>Compiled Repository Code Audit</h2>
+            <p class="subtitle">Complete static findings, dependency maps, and LLM design evaluations.</p>
+          </div>
+          <div class="report-actions">
+            <button id="download-md-btn" class="secondary-btn">Download Markdown (.md)</button>
+            <button id="download-json-btn" class="secondary-btn">Download JSON (.json)</button>
+          </div>
+        </div>
+        <div class="glass-card report-content-card">
+          <div class="report-markdown-view" id="report-view-container">
+            Click "Compile Report" below to run the security analyzer and architecture critique.
+          </div>
+          <div style="text-align: center; margin-top: var(--spacing-lg);" id="compile-report-placeholder">
+            <button id="compile-report-btn" class="primary-btn">Run Platform Code Audit &amp; Compile Report</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Progress Modal -->
+  <div class="modal-overlay" id="progress-modal" style="display: none;">
+    <div class="glass-card modal-content">
+      <h2>Indexing Repository...</h2>
+      <div class="spinner-container"><div class="spinner"></div></div>
+      <div class="progress-status-container">
+        <div class="progress-bar-container"><div class="progress-fill" id="modal-progress-bar" style="width: 10%"></div></div>
+        <div class="progress-pct" id="modal-progress-pct">10%</div>
+      </div>
+      <p class="status-msg" id="modal-status-msg">Extracting workspace content...</p>
+      <div class="terminal-feed" id="terminal-feed">
+        <div class="log-line">Initializing workspace ingestion...</div>
+      </div>
+      <button id="close-modal-btn" class="secondary-btn" style="margin-top: 1.5rem; display: none;">Dismiss</button>
+    </div>
+  </div>
+
+  <!-- Reports Generated Modal -->
+  <div class="modal-overlay" id="reports-modal" style="display: none;">
+    <div class="glass-card modal-content" style="max-width:500px;">
+      <h2>📄 Reports Generated</h2>
+      <p style="color:var(--text-secondary);margin:1rem 0;">All 5 due diligence reports have been generated in the reports directory.</p>
+      <div id="reports-modal-list" class="reports-generated-list"></div>
+      <button id="close-reports-modal-btn" class="primary-btn" style="margin-top:1.5rem;width:100%;">Close</button>
+    </div>
+  </div>
+
+  <script src="app.js?v=1.0.1"></script>
+</body>
+</html>

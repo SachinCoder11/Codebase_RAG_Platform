@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: analyzer-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - analyzer-data:/app/data
+      - ./logs:/app/logs
+    environment:
+      - BASE_DATA_DIR=/app/data
+      - OLLAMA_HOST=http://ollama-service:11434
+      - OLLAMA_MODEL=llama3
+      - REDIS_URL=redis://redis-broker:6379/0
+    depends_on:
+      - chromadb-service
+      - ollama-service
+      - redis-broker
+
+  chromadb-service:
+    image: chromadb/chroma:latest
+    container_name: analyzer-vectorstore
+    ports:
+      - "8001:8000"
+    volumes:
+      - chroma-data:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+
+  ollama-service:
+    image: ollama/ollama:latest
+    container_name: analyzer-inference
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+
+  # ── Worker Architecture Stubs ─────────────────────────────────────
+  # These services are prepared for future migration to a Redis-based
+  # distributed worker architecture. Currently inert (echo only).
+  # To activate: replace 'command' with the actual worker entrypoint.
+
+  redis-broker:
+    image: redis:7-alpine
+    container_name: analyzer-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: analyzer-worker
+    command: celery -A app.workers.celery_app worker --loglevel=info -c 2
+    environment:
+      - REDIS_URL=redis://redis-broker:6379/0
+      - BASE_DATA_DIR=/app/data
+      - OLLAMA_HOST=http://ollama-service:11434
+      - OLLAMA_MODEL=llama3
+    volumes:
+      - analyzer-data:/app/data
+    depends_on:
+      - redis-broker
+      - chromadb-service
+      - ollama-service
+
+volumes:
+  analyzer-data:
+  chroma-data:
+  ollama-data:
+  redis-data:
+

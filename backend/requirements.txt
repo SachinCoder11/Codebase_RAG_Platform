@@ -1,0 +1,15 @@
+fastapi>=0.110.0
+uvicorn>=0.28.0
+pydantic>=2.6.0
+pydantic-settings>=2.2.0
+chromadb>=0.4.24
+sentence-transformers>=2.5.0
+gitpython>=3.1.42
+python-multipart>=0.0.9
+aiofiles>=23.2.1
+requests>=2.31.0
+httpx>=0.26.0
+colorama>=0.4.6
+huggingface-hub>=0.23.0
+celery>=5.3.0
+redis>=5.0.0
