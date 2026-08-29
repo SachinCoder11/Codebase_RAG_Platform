@@ -1,4 +1,4 @@
-# AI Repository Analysis Platform
+# AI_Repository_Analysis_Platform
 
 A local-first Retrieval-Augmented Generation (RAG) application for understanding software repositories. Upload a ZIP archive or clone a Git repository, then ask grounded questions about its code. The platform indexes code into semantic chunks, retrieves relevant material, and asks a configurable LLM to answer with source references.
 
