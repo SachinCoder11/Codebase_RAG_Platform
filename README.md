@@ -8,7 +8,7 @@ This is the canonical project. `RAG_SHOWSTOPPER-main` was evaluated as an earlie
 
 - Ingest a ZIP archive or clone an HTTPS Git repository.
 - Scan source files and recognize Python, JavaScript/TypeScript, Java, and .NET code.
-- Extract code structure, create chunks and metadata, and persist embeddings in ChromaDB.
+- Extract code structure, create chunks and metadata, and persist embeddings in Vector DB.
 - Answer repository questions through standard and streaming RAG endpoints with retrieved-file citations.
 - Generate architecture, security, dependency, licensing, engineering-quality, modernization, and submission-oriented analysis.
 - Provide a browser UI plus FastAPI/OpenAPI endpoints.
