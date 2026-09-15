@@ -1,4 +1,4 @@
-// Global State Management
+// Global State Management.
 let activeRepositoryId = null;
 let activeRepositoryName = "";
 let indexedRepositories = [];
